@@ -1,0 +1,1 @@
+Litten is a python package to help visualize Tensorflow neural network models architecture.
