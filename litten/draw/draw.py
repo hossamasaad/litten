@@ -2,12 +2,12 @@ import os
 import sys
 
 sys.path.append(os.path.realpath(''))
-from litten.layers import *
+from litten.layers import   *
 
 import PIL.Image as Image
 from PIL import ImageDraw, ImageFont
 
-no_of_layers = 15
+no_of_layers = 20
 h = 320
 w = (4 * no_of_layers) * 20
 
@@ -43,6 +43,13 @@ layer9.draw(image)
 
 layer10 = RecurrentLayer("Dense", layer9.end, bi=False)
 layer10.draw(image)
+
+
+layer11 = ConvLSTM("Dense", layer10.end, 300, (256, 256, 3))
+layer11.draw(image)
+
+layer12 = FlattenLayer("Dense", layer11.end)
+layer12.draw(image)
 
 image.show()
 
