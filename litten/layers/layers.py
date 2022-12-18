@@ -178,19 +178,19 @@ class RecurrentLayer(Layer):
     def draw(self, image, show_properties=False):
         draw = ImageDraw.Draw(image)
         
-        points1 = [ self._start_x + 40, 100, self._start_x + 120, 160]
-        points2 = [(self._start_x + 40, 100), (self._start_x + 30, 90), (self._start_x + 30, 150), (self._start_x + 40, 160)]
-        points3 = [(self._start_x + 40, 100), (self._start_x + 30, 90), (self._start_x + 110, 90), (self._start_x + 120, 100)]
+        points1 = [ self._start_x + 40, 120, self._start_x + 120, 180]
+        points2 = [(self._start_x + 40, 120), (self._start_x + 30, 110), (self._start_x + 30, 170), (self._start_x + 40, 180)]
+        points3 = [(self._start_x + 40, 120), (self._start_x + 30, 110), (self._start_x + 110, 110), (self._start_x + 120, 120)]
 
         draw.rectangle(points1, fill = '#94a4b9', outline='#000000')
         draw.polygon  (points2, fill = '#94a4b9', outline='#000000')
         draw.polygon  (points3, fill = '#94a4b9', outline='#000000')
 
         # draw arrows
-        points5 = [(self._start_x + 60 , 120), (self._start_x + 100, 120), (self._start_x + 95, 115), (self._start_x + 100, 120), (self._start_x + 95, 125)]
-        points6 = [(self._start_x + 100, 140), (self._start_x + 60 , 140), (self._start_x + 65, 135), (self._start_x + 60 , 140), (self._start_x + 65, 145)]
+        points5 = [(self._start_x + 60 , 140), (self._start_x + 100, 140), (self._start_x + 95, 135), (self._start_x + 100, 140), (self._start_x + 95, 145)]
+        points6 = [(self._start_x + 100, 160), (self._start_x + 60 , 160), (self._start_x + 65, 155), (self._start_x + 60 , 160), (self._start_x + 65, 165)]
 
-        points7 = [(self._start_x + 60 , 130), (self._start_x + 100, 130), (self._start_x + 95, 125), (self._start_x + 100, 130), (self._start_x + 95, 135)]
+        points7 = [(self._start_x + 60 , 150), (self._start_x + 100, 150), (self._start_x + 95, 145), (self._start_x + 100, 150), (self._start_x + 95, 155)]
 
         if self.bi:
             draw.line(points5, fill="#000000")
@@ -207,40 +207,35 @@ class RecurrentLayer(Layer):
 
 
 class ConvLSTM(Layer):
-    def __init__(self, name, number) -> None:
-        super().__init__(name, number)
-    
-    def draw(self, image, show_properties=False):
-        return super().draw(image, show_properties)
+    def __init__(self, name, start_x, kernels, shape) -> None:
+        super().__init__(name, start_x)
+        self.units = kernels
+        self.shape = shape
+        self._c    = int(min(math.log(kernels, 2), 10))
+        self._s    = min(int(shape[0]/100), 10)
 
-    def show_prop(self):
-        pass
-
-
-class NormaliztionLayer(Layer):
-    def __init__(self, name, number) -> None:
-        super().__init__(name, number)
-    
     def draw(self, image, show_properties=False):
         draw = ImageDraw.Draw(image)
+        points = [self._start_x + 30                     , 110 - 5 * self._c // 2 - 10 * self._s // 2,
+                  self._start_x + 100 + 10 * self._s, 170 - 5 * self._c // 2 + 10 * self._s // 2]
 
-        draw.rectangle((4 * (self.number - 1) * 20 + 20, 160, 4 * (self.number - 1) * 20 + 60, 120), fill = '#94a4b2', outline='#000000')
-        draw.rectangle((4 * (self.number - 1) * 20 + 25, 165, 4 * (self.number - 1) * 20 + 65, 125), fill = '#edebd8', outline='#000000')
-        draw.rectangle((4 * (self.number - 1) * 20 + 30, 170, 4 * (self.number - 1) * 20 + 70, 130), fill = '#94a4b2', outline='#000000')
-        draw.rectangle((4 * (self.number - 1) * 20 + 35, 175, 4 * (self.number - 1) * 20 + 75, 135), fill = '#edebd8', outline='#000000')
-
-        return image
-
-    def show_prop(self):
-        pass
+        for i in range(self._c):
+            draw.rectangle(points, fill = '#94a4b2', outline='#000000')
+            points[0], points[1], points[2], points[3] = points[0] + 5, points[1] + 5, points[2] + 5, points[3] + 5
+        
+        points[0], points[1], points[2], points[3] = points[0] - 5, points[1] - 5, points[2] - 5, points[3] - 5
 
 
-class RegularizationLayer(Layer):
-    def __init__(self, name, number) -> None:
-        super().__init__(name, number)
-    
-    def draw(self, image, show_properties=False):
-        return super().draw(image, show_properties)
+        points2 = [(points[0] + (points[2] - points[0]) // 5, points[1] + (points[3] - points[1]) // 2),
+                   (points[0] + 4 * (points[2] - points[0]) // 5, points[1] + (points[3] - points[1]) // 2),
+                   (points[0] + 4 * (points[2] - points[0]) // 5 - 5, points[1] + (points[3] - points[1]) // 2 - 5),
+                   (points[0] + 4 * (points[2] - points[0]) // 5, points[1] + (points[3] - points[1]) // 2),
+                   (points[0] + 4 * (points[2] - points[0]) // 5 - 5, points[1] + (points[3] - points[1]) // 2 + 5)]
+
+        draw.line(points2, fill="#000000")
+            
+        # update end_x
+        self._end_x = points[2] + 20
 
     def show_prop(self):
         pass
@@ -263,3 +258,23 @@ class ActivationLayer(Layer):
     def show_prop():
         pass
 
+
+class FlattenLayer(Layer):
+
+    def __init__(self, name, start_x) -> None:
+        super().__init__(name, start_x)
+    
+    def draw(self, image, show_properties=False):
+        draw = ImageDraw.Draw(image)
+
+        points1 = [ self._start_x + 40, 150, self._start_x + 60, 170]
+        points2 = [(self._start_x + 40, 150), (self._start_x, 90), (self._start_x, 110), (self._start_x + 40, 170)]
+        points3 = [(self._start_x + 40, 150), (self._start_x, 90), (self._start_x + 20, 90), (self._start_x + 60, 150)]
+
+        draw.rectangle(points1, fill = '#94a4b9', outline='#000000')
+        draw.polygon  (points2, fill = '#94a4b9', outline='#000000')
+        draw.polygon  (points3, fill = '#94a4b9', outline='#000000')
+
+        # update end_x
+        self._end_x = self._start_x + 140
+        return image
