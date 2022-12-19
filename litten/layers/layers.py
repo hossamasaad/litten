@@ -27,7 +27,7 @@ class Layer:
         points = [(self._start_x + 20, 80),
                   (self._start_x + 60, 200)]
         
-        draw.rounded_rectangle(xy  = points, radius=5, fill=self.palette.main_color)
+        draw.rounded_rectangle(xy  = points, radius=3, fill=self.palette.main_color)
         
         draw.ellipse((points[0][0] + 10, points[0][1] + 15, points[0][0] + 30, points[0][1] + 35 ), fill = '#ffffff', outline='#000')
         draw.ellipse((points[0][0] + 10, points[0][1] + 50, points[0][0] + 30, points[0][1] + 70 ), fill = '#ffffff', outline='#000')
@@ -44,6 +44,12 @@ class Layer:
 
     def show_prop(self):
         pass
+    
+    def get_from(self):
+        return [(self._start_x + 60, 80), (self._start_x + 60, 200)]
+
+    def get_to(self):
+        return [(self._start_x + 20, 80), (self._start_x + 20, 200)]
 
 
 class InputLayer(Layer):
@@ -77,6 +83,9 @@ class InputLayer(Layer):
 
     def show_prop(self):
         pass
+    
+    def get_from(self):
+        return [(self._start_x + 40, 40), (self._start_x + 40, 240)]
 
 
 class DenseLayer(Layer):
@@ -97,11 +106,20 @@ class DenseLayer(Layer):
             image: The image after drawing the layer
         """
         draw = ImageDraw.Draw(image)
-
-        draw.ellipse((self._start_x + 20, 60 , self._start_x + 60, 100), fill = self.palette.main_color, outline='#000000')
-        draw.ellipse((self._start_x + 20, 120, self._start_x + 60, 160), fill = self.palette.main_color, outline='#000000')
-        draw.ellipse((self._start_x + 20, 180, self._start_x + 60, 220), fill = self.palette.main_color, outline='#000000')
+        points = [(self._start_x + 20, 60),
+                  (self._start_x + 60, 220)]
         
+        draw.rounded_rectangle(xy  = points, radius=5, fill=self.palette.main_color)
+        
+        draw.ellipse((points[0][0] + 10, points[0][1] + 15, points[0][0] + 30, points[0][1] + 35 ), fill = '#ffffff', outline='#000')
+        draw.ellipse((points[0][0] + 10, points[0][1] + 50, points[0][0] + 30, points[0][1] + 70 ), fill = '#ffffff', outline='#000')
+        draw.ellipse((points[0][0] + 10, points[0][1] + 120, points[0][0] + 30, points[0][1] + 140), fill = '#ffffff', outline='#000')
+
+        draw.line   ([(points[0][0] + 20, points[0][1] + 80 ), (points[0][0] + 20, points[0][1] + 81 )], fill='#000000', width=2)
+        draw.line   ([(points[0][0] + 20, points[0][1] + 90 ), (points[0][0] + 20, points[0][1] + 91 )], fill='#000000', width=2)
+        draw.line   ([(points[0][0] + 20, points[0][1] + 100), (points[0][0] + 20, points[0][1] + 101)], fill='#000000', width=2)
+        draw.line   ([(points[0][0] + 20, points[0][1] + 110), (points[0][0] + 20, points[0][1] + 111)], fill='#000000', width=2)
+
         # update end_x
         self._end_x = self._start_x + 80
 
@@ -109,6 +127,12 @@ class DenseLayer(Layer):
 
     def show_prop(self):
         pass
+
+    def get_from(self):
+        return [(self._start_x + 60, 63), (self._start_x + 60, 217)]
+    
+    def get_to(self):
+        return [(self._start_x + 20, 63), (self._start_x + 20, 217)]
 
 
 class ConvLayer(Layer):
@@ -124,7 +148,7 @@ class ConvLayer(Layer):
 
     def draw(self, image, show_properties=False):
         draw = ImageDraw.Draw(image)
-        points = [self._start_x + 30                     , 110 - 5 * self._c // 2 - 10 * self._s // 2,
+        points = [self._start_x + 30                , 110 - 5 * self._c // 2 - 10 * self._s // 2,
                   self._start_x + 100 + 10 * self._s, 170 - 5 * self._c // 2 + 10 * self._s // 2]
 
         for i in range(self._c):
@@ -143,6 +167,28 @@ class ConvLayer(Layer):
 
     def show_prop(self):
         pass
+    
+    def get_from(self):
+        point_start = [self._start_x + 30                , 110 - 5 * self._c // 2 - 10 * self._s // 2,
+                       self._start_x + 100 + 10 * self._s, 170 - 5 * self._c // 2 + 10 * self._s // 2]
+        
+        point_end   = [self._start_x + 30                         + 5 * (self._c - 1), 110 - 5 * self._c // 2 - 10 * self._s // 2 + 5 * (self._c - 1),
+                       self._start_x + 100 + 10    * self._s      + 5 * (self._c - 1), 170 - 5 * self._c // 2 + 10 * self._s // 2 + 5 * (self._c - 1)]
+
+        return [(point_end[2], point_end[1]),
+                (point_end[2], point_end[3]),
+                (point_start[2], point_start[1])]
+    
+    def get_to(self):
+        point_start = [self._start_x + 30                , 110 - 5 * self._c // 2 - 10 * self._s // 2,
+                       self._start_x + 100 + 10 * self._s, 170 - 5 * self._c // 2 + 10 * self._s // 2]
+        point_end   = [self._start_x + 30                         + 5 * (self._c - 1), 110 - 5 * self._c // 2 - 10 * self._s // 2 + 5 * (self._c - 1),
+                       self._start_x + 100 + 10    * self._s      + 5 * (self._c - 1), 170 - 5 * self._c // 2 + 10 * self._s // 2 + 5 * (self._c - 1)]
+
+
+        return [(point_end[0], point_end[1]),
+                (point_end[0], point_end[3]),
+                (point_start[0], point_start[1])]
 
 
 class PoolingLayer(Layer):
@@ -178,6 +224,28 @@ class PoolingLayer(Layer):
     def show_prop(self):
         pass
 
+    def get_from(self):
+        point_start = [self._start_x + 30                , 110 - 5 * self._c // 2 - 10 * self._s // 2,
+                       self._start_x + 100 + 10 * self._s, 170 - 5 * self._c // 2 + 10 * self._s // 2]
+        
+        point_end   = [self._start_x + 30                         + 5 * (self._c - 1), 110 - 5 * self._c // 2 - 10 * self._s // 2 + 5 * (self._c - 1),
+                       self._start_x + 100 + 10    * self._s      + 5 * (self._c - 1), 170 - 5 * self._c // 2 + 10 * self._s // 2 + 5 * (self._c - 1)]
+
+        return [(point_end[2], point_end[1]),
+                (point_end[2], point_end[3]),
+                (point_start[2], point_start[1])]
+    
+    def get_to(self):
+        point_start = [self._start_x + 30                , 110 - 5 * self._c // 2 - 10 * self._s // 2,
+                       self._start_x + 100 + 10 * self._s, 170 - 5 * self._c // 2 + 10 * self._s // 2]
+        point_end   = [self._start_x + 30                         + 5 * (self._c - 1), 110 - 5 * self._c // 2 - 10 * self._s // 2 + 5 * (self._c - 1),
+                       self._start_x + 100 + 10    * self._s      + 5 * (self._c - 1), 170 - 5 * self._c // 2 + 10 * self._s // 2 + 5 * (self._c - 1)]
+
+
+        return [(point_end[0], point_end[1]),
+                (point_end[0], point_end[3]),
+                (point_start[0], point_start[1])]
+
 
 class EmbeddingLayer(Layer):
     """
@@ -196,6 +264,12 @@ class EmbeddingLayer(Layer):
 
     def show_prop(self):
         pass
+    
+    def get_from(self):
+        return [(self._start_x + 57, 60), (self._start_x + 57, 200)]
+    
+    def get_to(self):
+        return [(self._start_x + 23, 60), (self._start_x + 23, 200)]
 
 
 class RecurrentLayer(Layer):
@@ -224,10 +298,10 @@ class RecurrentLayer(Layer):
         points7 = [(self._start_x + 60 , 150), (self._start_x + 100, 150), (self._start_x + 95, 145), (self._start_x + 100, 150), (self._start_x + 95, 155)]
 
         if self.bi:
-            draw.line(points5, fill=self.palette.secondry)
-            draw.line(points6, fill=self.palette.secondry)
+            draw.line(points5, fill="#000000")
+            draw.line(points6, fill="#000000")
         else:
-            draw.line(points7, fill=self.palette.secondry)
+            draw.line(points7, fill="#000000")
 
         # update end_x
         self._end_x = self._start_x + 140
@@ -235,6 +309,16 @@ class RecurrentLayer(Layer):
 
     def show_prop(self):
         pass
+
+    def get_from(self):
+        return [(self._start_x + 120, 120),
+                (self._start_x + 120, 180),
+                (self._start_x + 110, 110)]
+    
+    def get_to(self):
+        return [(self._start_x + 40, 120),
+                (self._start_x + 40, 180),
+                (self._start_x + 30, 110)]
 
 
 class ConvLSTM(Layer):
@@ -266,14 +350,36 @@ class ConvLSTM(Layer):
                    (points[0] + 4 * (points[2] - points[0]) // 5, points[1] + (points[3] - points[1]) // 2),
                    (points[0] + 4 * (points[2] - points[0]) // 5 - 5, points[1] + (points[3] - points[1]) // 2 + 5)]
 
-        draw.line(points2, fill=self.palette.secondry)
+        draw.line(points2, fill="#000000")
             
         # update end_x
         self._end_x = points[2] + 20
 
     def show_prop(self):
         pass
+    
+    def get_from(self):
+        point_start = [self._start_x + 30                , 110 - 5 * self._c // 2 - 10 * self._s // 2,
+                       self._start_x + 100 + 10 * self._s, 170 - 5 * self._c // 2 + 10 * self._s // 2]
+        
+        point_end   = [self._start_x + 30                         + 5 * (self._c - 1), 110 - 5 * self._c // 2 - 10 * self._s // 2 + 5 * (self._c - 1),
+                       self._start_x + 100 + 10    * self._s      + 5 * (self._c - 1), 170 - 5 * self._c // 2 + 10 * self._s // 2 + 5 * (self._c - 1)]
 
+        return [(point_end[2], point_end[1]),
+                (point_end[2], point_end[3]),
+                (point_start[2], point_start[1])]
+
+    def get_to(self):
+        point_start = [self._start_x + 30                , 110 - 5 * self._c // 2 - 10 * self._s // 2,
+                       self._start_x + 100 + 10 * self._s, 170 - 5 * self._c // 2 + 10 * self._s // 2]
+        point_end   = [self._start_x + 30                         + 5 * (self._c - 1), 110 - 5 * self._c // 2 - 10 * self._s // 2 + 5 * (self._c - 1),
+                       self._start_x + 100 + 10    * self._s      + 5 * (self._c - 1), 170 - 5 * self._c // 2 + 10 * self._s // 2 + 5 * (self._c - 1)]
+
+
+        return [(point_end[0], point_end[1]),
+                (point_end[0], point_end[3]),
+                (point_start[0], point_start[1])]
+    
 
 class ActivationLayer(Layer):
     """
@@ -295,6 +401,12 @@ class ActivationLayer(Layer):
     def show_prop():
         pass
 
+    def get_from(self):
+        return [(self._start_x + 60, 120), (self._start_x + 60, 160)]
+    
+    def get_to(self):
+        return [(self._start_x + 20, 120), (self._start_x + 20, 160)]
+
 
 class FlattenLayer(Layer):
     """
@@ -307,18 +419,27 @@ class FlattenLayer(Layer):
 
         draw = ImageDraw.Draw(image)
 
-        points1 = [ self._start_x + 40, 150, self._start_x + 60, 170]
-        points2 = [(self._start_x + 40, 150), (self._start_x, 90), (self._start_x, 110), (self._start_x + 40, 170)]
-        points3 = [(self._start_x + 40, 150), (self._start_x, 90), (self._start_x + 20, 90), (self._start_x + 60, 150)]
+        points1 = [ self._start_x + 40, 170, self._start_x + 60, 190]
+        points2 = [(self._start_x + 40, 170), (self._start_x, 110), (self._start_x, 130), (self._start_x + 40, 190)]
+        points3 = [(self._start_x + 40, 170), (self._start_x, 110), (self._start_x + 20, 110), (self._start_x + 60, 170)]
 
         draw.rectangle(points1, fill = self.palette.main_color, outline='#000000')
         draw.polygon  (points2, fill = self.palette.main_color, outline='#000000')
         draw.polygon  (points3, fill = self.palette.main_color, outline='#000000')
 
         # update end_x
-        self._end_x = self._start_x + 140
+        self._end_x = self._start_x + 80
         return image
 
     def show_prop(self):
         pass
 
+    def get_from(self):
+        return [(self._start_x + 60, 170),
+                (self._start_x + 60, 190),
+                (self._start_x + 20, 110)]
+    
+    def get_to(self):
+        return [(self._start_x + 40, 170),
+                (self._start_x + 40, 190),
+                (self._start_x, 110)]
