@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.path.realpath(''))
 from litten.draw import get_layer_name 
 
-class ModelDetails:
+class LayersSummary:
     def __init__(self, model) -> None:
         self.model = model
 
