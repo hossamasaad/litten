@@ -3,87 +3,98 @@ import sys
 
 sys.path.append(os.path.realpath(''))
 
+from litten.draw import utils
+import PIL.Image as Image
+
+from litten.draw import palettes
 from litten.layers import *
-from palettes import *
-from PIL import ImageDraw, ImageFont
-import PIL.Image as Image
 
 
-no_of_layers = 20
-h = 320
-w = (4 * no_of_layers) * 20
-palette = Default
+class Drawer:
+    def __init__(self, model, background_color = "#FFFFFF", palette = 'default', show_connectors=False, show_names=False, show_proporties=False) -> None:
+        self.model            = model
+        self.background_color = background_color
+        self.show_names       = show_names
+        self.show_proporties  = show_proporties
+        self.show_connectors  = show_connectors
+        self.width     = utils.get_width(model.layers)
+        self.height    = 320
+        self.palette   = utils.palettes[palette]
+        self.image     = Image.new("RGB", (self.width, self.height), color=self.background_color)
+        self.connector = Connector()
 
-image = Image.new("RGB", (w, h), color = '#ffffff')
+    def draw(self):
+        
+        layers = self.model.layers
+        last_layer = None
 
+        # Draw input layer
+        shape = None
+        layer_name = utils.get_layer_name(layer=layers[0])
 
-c = Connector()
+        if layer_name == "Input": 
+            shape = layers[0].shape
+            del layers[0]
+        else:
+            shape = layers[0].input_shape
 
-layer1 = InputLayer("Input", 0, palette)
-layer1.draw(image)
+        last_layer = InputLayer(name="Input", shape=shape, start_x=20, palette=self.palette)
+        last_layer.draw(image=self.image, show_name=self.show_names, show_properties=self.show_proporties)
+        curr_layer = None
 
-layer2 = Layer("Input", layer1.end, palette)
-layer2.draw(image)
+        for layer in layers:
+            
+            layer_name = utils.get_layer_name(layer=layer)
 
-c.connect(image, layer1, layer2)
+            if layer_name == "Flatten":
+                curr_layer = FlattenLayer(name=layer_name, input_shape=layer.input_shape, output_shape=layer.output_shape, start_x=last_layer.end, palette=self.palette)
+            
+            elif layer_name == "Dense":
+                activation = utils.get_activation_name(layer=layer)
+                curr_layer = DenseLayer(name=layer_name, units=layer.units, activation=activation, input_shape=layer.input_shape, output_shape=layer.output_shape, start_x=last_layer.end, palette=self.palette)
+            
+            elif layer_name == "Embedding":
+                curr_layer = EmbeddingLayer(name=layer_name, input_dim=layer.input_dim, output_dim=layer.output_dim, input_shape=layer.input_shape, output_shape=layer.output_shape, start_x=last_layer.end, palette=self.palette)
 
-layer3 = DenseLayer("Dense", layer2.end, palette, 100)
-layer3.draw(image)
+            elif layer_name in utils.activations:
+                activation = None
+                if layer_name == "Activation":
+                    activation = utils.get_activation_name(layer=layer)
+                curr_layer = ActivationLayer(name=layer_name, activation=activation, start_x=last_layer.end, palette=self.palette)
 
-c.connect(image, layer2, layer3)
+            elif layer_name in utils.convs:
+                activation = utils.get_activation_name(layer=layer)
+                curr_layer = ConvLayer(name=layer_name, filters=layer.filters, kernel=layer.kernel_size, activation=activation, input_shape=layer.input_shape, output_shape=layer.output_shape, start_x=last_layer.end, palette=self.palette)
 
-layer4 = ConvLayer("Dense", layer3.end, palette, 1024, (500, 500, 3))
-layer4.draw(image)
-c.connect(image, layer3, layer4)
+            elif layer_name in utils.pools:
+                curr_layer = PoolingLayer(name=layer_name, pool_size=layer.pool_size, padding=layer.padding, input_shape=layer.input_shape, output_shape=layer.output_shape, start_x=last_layer.end, palette=self.palette)
 
-layer5 = ConvLayer("Dense", layer4.end, palette, 64, (250, 250, 3))
-layer5.draw(image)
-c.connect(image, layer4, layer5)
+            elif layer_name in utils.rnns:
+                bi = False
+                if layer_name == 'Bidirectional':
+                    bi = True
+                    layer = layer.layer
+                    layer_name = "Bi(" + utils.get_layer_name(layer) + ")"
 
-layer6 = PoolingLayer("Dense", layer5.end, palette, 64, (75, 75, 3))
-layer6.draw(image)
-c.connect(image, layer5, layer6)
+                activation = utils.get_activation_name(layer=layer)
+                curr_layer = RecurrentLayer(name=layer_name, units=layer.units, activation=activation, bi=bi, start_x=last_layer.end, palette=self.palette)
 
-layer7 = EmbeddingLayer("Dense", layer6.end, palette)
-layer7.draw(image)
-c.connect(image, layer6, layer7)
+            elif layer_name in utils.convlstms:
+                activation = utils.get_activation_name(layer=layer)
+                curr_layer = ConvLayer(name=layer_name, filters=layer.filters, kernel=layer.kernel_size, activation=activation, input_shape=layer.input_shape, output_shape=layer.output_shape, start_x=last_layer.end, palette=self.palette)
 
-layer8 = ActivationLayer("Dense", layer7.end, palette)
-layer8.draw(image)
-c.connect(image, layer7, layer8)
+            else:
+                curr_layer = Layer(layer_name, start_x=last_layer.end, palette=self.palette)
 
-layer9 = RecurrentLayer("Dense", layer8.end, palette, bi=True)
-layer9.draw(image)
-c.connect(image, layer8, layer9)
+            curr_layer.draw(image=self.image, show_name=self.show_names, show_properties=self.show_proporties)
 
-layer10 = RecurrentLayer("Dense", layer9.end, palette, bi=False)
-layer10.draw(image)
-c.connect(image, layer9, layer10)
+            if self.show_connectors:
+                self.connector.connect(image=self.image, layer1=last_layer, layer2=curr_layer)
 
-layer11 = ConvLSTM("Dense", layer10.end, palette, 300, (256, 256, 3))
-layer11.draw(image)
-c.connect(image, layer10, layer11)
+            last_layer = curr_layer
+        
+        if self.show_connectors:
+            self.connector.output(image=self.image, layer1=last_layer)
 
-layer12 = FlattenLayer("Dense", layer11.end, palette)
-layer12.draw(image)
-c.connect(image, layer11, layer12)
-
-layer13 = DenseLayer("Dense", layer12.end, palette, 100)
-layer13.draw(image)
-c.connect(image, layer12, layer13)
-
-image.show()
-
-"""
-import PIL.Image as Image
-import PIL.ImageDraw as ImageDraw
-import matplotlib.pyplot as plt
-
-image = Image.new("RGB", (80, 360), color = '#ffffff')
-draw = ImageDraw.Draw(image)
-
-draw.rectangle((20, 180, 60, 140), fill = '#98c1d9', outline='#000000')
-draw.ellipse  ((25, 145, 55, 175), fill = '#ffffff', outline='#000000')
-
-image.show()
-"""
+        self.image.resize((last_layer.end + 20, 320))
+        self.image.show()
