@@ -1,6 +1,6 @@
 from keras.layers import Layer
 from litten.layers import *
-from litten.draw.palettes import *
+from litten.visualize.palettes import *
 
 
 palettes = {

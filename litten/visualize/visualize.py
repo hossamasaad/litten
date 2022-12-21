@@ -1,16 +1,18 @@
 import os
 import sys
-
 sys.path.append(os.path.realpath(''))
 
-from litten.draw import utils
+import numpy as np
+import matplotlib.pyplot as plt
 import PIL.Image as Image
+from tensorflow.keras.models import Model
 
-from litten.draw import palettes
+from litten import utils
+from litten.visualize import palettes
 from litten.layers import *
 
 
-class Drawer:
+class ModelVisualizer:
     def __init__(self, model, background_color = "#FFFFFF", palette = 'default', show_connectors=False, show_names=False, show_proporties=False) -> None:
         self.model            = model
         self.background_color = background_color
@@ -23,7 +25,7 @@ class Drawer:
         self.image     = Image.new("RGB", (self.width, self.height), color=self.background_color)
         self.connector = Connector()
 
-    def draw(self):
+    def visualize_model(self):
         
         layers = self.model.layers
         last_layer = None
@@ -98,3 +100,53 @@ class Drawer:
 
         self.image.resize((last_layer.end + 20, 320))
         self.image.show()
+
+    def visualize_featuremap(self, input_image, cmap = "gray"):
+
+        image = np.expand_dims(input_image, axis=0)
+        
+        fig = plt.figure()
+        fig.suptitle("{}".format("Input Image") , fontsize=18)
+        plt.imshow(input_image)
+
+        for layer in self.model.layers:  
+
+            if 'conv' not in layer.name:
+                continue    
+            
+            
+            intermediate_model = Model(inputs=self.model.inputs , outputs=layer.output)
+            features = intermediate_model.predict(image)
+
+            fig = plt.figure(figsize=(20, 20))
+            fig.suptitle("{}".format(layer.name) , fontsize=18)
+
+            for i in range(1, features.shape[3]+1):
+                plt.subplot(8,8,i)
+                plt.imshow(features[0,:,:,i-1] , cmap=cmap)
+
+            plt.show()
+    
+    def visualize_filters(self, cmap = "gray"):
+    
+        for layer in self.model.layers:  
+
+            if 'conv' not in layer.name:
+                continue    
+            
+            filters, _ = layer.get_weights()
+
+            fig = plt.figure(figsize=(10,10))
+            fig.suptitle("{}".format(layer.name) , fontsize=18)
+
+            idx=1
+            no_filters = 6
+
+            for i in range(no_filters):
+                filter = filters[:,:,:,i]
+                ch = min(filter.shape[2], 3)
+                for j in range(ch):
+                    plt.subplot(no_filters, ch, idx)
+                    plt.imshow(filter[:,:,j], cmap=cmap)
+                    idx += 1
+            plt.show()
