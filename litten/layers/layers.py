@@ -29,14 +29,14 @@ class Layer:
         draw default layer 
         """
         draw = ImageDraw.Draw(image)
-        points = [(self._start_x + 2000, 800),
-                  (self._start_x + 60, 200)]
+        points = [(self._start_x + 200, 800),
+                  (self._start_x + 600, 2000)]
         
         draw.rounded_rectangle(xy  = points, radius=3, fill=self.palette.main_color)
         
-        draw.ellipse((points[0][0] + 100, points[0][1] + 150, points[0][0] + 300, points[0][1] + 350 ), fill = '#ffffff', outline='#000')
-        draw.ellipse((points[0][0] + 100, points[0][1] + 500, points[0][0] + 300, points[0][1] + 700 ), fill = '#ffffff', outline='#000')
-        draw.ellipse((points[0][0] + 100, points[0][1] + 850, points[0][0] + 300, points[0][1] + 1050), fill = '#ffffff', outline='#000')
+        draw.ellipse((points[0][0] + 100, points[0][1] + 150, points[0][0] + 300, points[0][1] + 350 ), fill = '#ffffff', outline='#000', width=3)
+        draw.ellipse((points[0][0] + 100, points[0][1] + 500, points[0][0] + 300, points[0][1] + 700 ), fill = '#ffffff', outline='#000', width=3)
+        draw.ellipse((points[0][0] + 100, points[0][1] + 850, points[0][0] + 300, points[0][1] + 1050), fill = '#ffffff', outline='#000', width=3)
 
         # update end_x
         self._end_x = self._start_x + 800
@@ -145,9 +145,9 @@ class DenseLayer(Layer):
         
         draw.rounded_rectangle(xy  = points, radius=5, fill=self.palette.main_color)
         
-        draw.ellipse((points[0][0] + 100, points[0][1] + 150 , points[0][0] + 300, points[0][1] + 350 ), fill = '#ffffff', outline='#000')
-        draw.ellipse((points[0][0] + 100, points[0][1] + 500 , points[0][0] + 300, points[0][1] + 700 ), fill = '#ffffff', outline='#000')
-        draw.ellipse((points[0][0] + 100, points[0][1] + 1200, points[0][0] + 300, points[0][1] + 1400), fill = '#ffffff', outline='#000')
+        draw.ellipse((points[0][0] + 100, points[0][1] + 150 , points[0][0] + 300, points[0][1] + 350 ), fill = '#ffffff', outline='#000', width=3)
+        draw.ellipse((points[0][0] + 100, points[0][1] + 500 , points[0][0] + 300, points[0][1] + 700 ), fill = '#ffffff', outline='#000', width=3)
+        draw.ellipse((points[0][0] + 100, points[0][1] + 1200, points[0][0] + 300, points[0][1] + 1400), fill = '#ffffff', outline='#000', width=3)
 
         draw.line   ([(points[0][0] + 200, points[0][1] + 800 ), (points[0][0] + 200, points[0][1] + 810 )], fill='#000000', width=20)
         draw.line   ([(points[0][0] + 200, points[0][1] + 900 ), (points[0][0] + 200, points[0][1] + 910 )], fill='#000000', width=20)
@@ -620,7 +620,7 @@ class ActivationLayer(Layer):
         draw = ImageDraw.Draw(image)
 
         draw.rectangle((self._start_x + 200, 1600, self._start_x + 600, 1200), fill = self.palette.main_color)
-        draw.ellipse  ((self._start_x + 250, 1250, self._start_x + 550, 1550), fill = '#ffffff', outline='#000000')
+        draw.ellipse  ((self._start_x + 250, 1250, self._start_x + 550, 1550), fill = '#ffffff', outline='#000000', width=3)
 
         if show_properties:
             self._show_prop(image)
@@ -708,3 +708,66 @@ class FlattenLayer(Layer):
         return [(self._start_x + 100, 1400),
                 (self._start_x + 100, 1600),
                 (self._start_x + 200, 1300)]
+
+
+class DropoutLayer(Layer):
+    def __init__(self, name: str, rate, start_x: int, palette) -> None:
+        super().__init__(name, start_x, palette)
+        self.rate = rate
+
+    def draw(self, image, show_name = False, show_properties=False):
+
+        draw = ImageDraw.Draw(image)
+        points = [(self._start_x + 200, 800),
+                  (self._start_x + 600, 2000)]
+        
+        draw.rounded_rectangle(xy  = points, radius=3, fill=self.palette.drop)
+        
+        draw.ellipse((points[0][0] + 100, points[0][1] + 150, points[0][0] + 300, points[0][1] + 350 ), fill = '#ffffff', outline='#000', width=3)
+        draw.ellipse((points[0][0] + 100, points[0][1] + 500, points[0][0] + 300, points[0][1] + 700 ), fill = '#ffffff', outline='#000', width=3)
+        draw.ellipse((points[0][0] + 100, points[0][1] + 850, points[0][0] + 300, points[0][1] + 1050), fill = '#ffffff', outline='#000', width=3)
+
+        draw.line([(points[0][0] + 130, points[0][1] + 180), (points[0][0] + 270, points[0][1] + 320)], fill = '#000000', width=10)
+        draw.line([(points[0][0] + 270, points[0][1] + 180), (points[0][0] + 130, points[0][1] + 320)], fill = '#000000', width=10)
+
+
+        # update end_x
+        self._end_x = self._start_x + 800
+
+        if show_properties:
+            self._show_prop(image)
+        elif show_name:
+            self._show_name(image)
+    
+    def _show_prop(self, image):
+        draw = ImageDraw.Draw(image)
+
+        points = (self._start_x + 200, 2100)
+        draw.text(points, text=self.name, fill="#000000", font=font)
+
+        points = (self._start_x + 200, 2220)
+        draw.text(points, text="rate: {}".format(self.rate), fill="#000000", font=font)
+
+class NormalizationLayer(Layer):
+    def __init__(self, name: str, start_x: int, palette) -> None:
+        super().__init__(name, start_x, palette)
+    
+    def draw(self, image, show_name = False, show_properties=False):
+
+        draw = ImageDraw.Draw(image)
+        points = [(self._start_x + 200, 800),
+                  (self._start_x + 600, 2000)]
+        
+        draw.rounded_rectangle(xy  = points, radius=3, fill=self.palette.reg)
+        
+        draw.ellipse((points[0][0] + 100, points[0][1] + 150, points[0][0] + 300, points[0][1] + 350 ), fill = '#ffffff', outline='#000', width=3)
+        draw.ellipse((points[0][0] + 100, points[0][1] + 500, points[0][0] + 300, points[0][1] + 700 ), fill = '#ffffff', outline='#000', width=3)
+        draw.ellipse((points[0][0] + 100, points[0][1] + 850, points[0][0] + 300, points[0][1] + 1050), fill = '#ffffff', outline='#000', width=3)
+
+        # update end_x
+        self._end_x = self._start_x + 800
+
+        if show_properties:
+            self._show_prop(image)
+        elif show_name:
+            self._show_name(image)
