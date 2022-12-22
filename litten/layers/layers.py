@@ -1,7 +1,10 @@
 import math
-
+from matplotlib import font_manager
 from PIL import ImageDraw, ImageFont 
-font = ImageFont.truetype("layers/FreeMonoBold.ttf", 100)
+
+
+fonts = font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
+font = ImageFont.truetype(font=fonts[0], size=100)
 
 
 class Layer:
