@@ -8,7 +8,10 @@ palettes = {
     "red"    :Reds,
     "blue"   :Blues,
     "gray"   :Grays,
-    "green"  :Greens
+    "green"  :Greens,
+    "brown"  :Browns,
+    "yellow" :Yellows,
+    "purple" :Purples
 }
 
 activations    = ["Activation", "Softmax", "ELU", "ReLU", "PReLU", "LeakyReLU", "ThresholdedReLU"]
