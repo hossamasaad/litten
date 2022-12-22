@@ -47,3 +47,4 @@ class Greens(ColorPallete):
     secondry   = "#87a08b"
     reg        = "#d2d6a8"
     drop       = "#3a5335"
+
