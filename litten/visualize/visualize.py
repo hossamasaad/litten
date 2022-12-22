@@ -10,6 +10,7 @@ from tensorflow.keras.models import Model
 from litten import utils
 from litten.visualize import palettes
 from litten.layers import *
+from IPython.display import display
 
 
 class ModelVisualizer:
@@ -19,8 +20,8 @@ class ModelVisualizer:
         self.show_names       = show_names
         self.show_proporties  = show_proporties
         self.show_connectors  = show_connectors
-        self.width     = utils.get_width(model.layers)
-        self.height    = 320
+        self.width     = utils.get_width(model.layers) * 10
+        self.height    = 3200
         self.palette   = utils.palettes[palette]
         self.image     = Image.new("RGB", (self.width, self.height), color=self.background_color)
         self.connector = Connector()
@@ -98,8 +99,9 @@ class ModelVisualizer:
         if self.show_connectors:
             self.connector.output(image=self.image, layer1=last_layer)
 
-        self.image.resize((last_layer.end + 20, 320))
-        self.image.show()
+        scale = 1
+        display(self.image.resize(( int(self.image.width * scale), int(self.image.height * scale))))
+
 
     def visualize_featuremap(self, input_image, cmap = "gray"):
 

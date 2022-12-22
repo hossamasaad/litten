@@ -4,11 +4,11 @@ sys.path.append(os.path.realpath(''))
 from litten import utils 
 
 class LayersSummary:
-    def __init__(self, model) -> None:
-        self.model = model
+    def __init__(self) -> None:
+        pass
 
-    def show_layers_summaries(self):
-        for i, layer in enumerate(self.model.layers):
+    def show_layers_summaries(self, model):
+        for i, layer in enumerate(model.layers):
             print("=================================================================================================================")
             x = "Layer {}: {}".format(i+1, utils.get_layer_name(layer))
             x = x + " " * (24 - len(x)) + "| Attributes"

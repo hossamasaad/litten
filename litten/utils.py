@@ -31,7 +31,7 @@ def get_width(layers):
             width += 70
         elif layer_name in convs or layer_name in pools or layer_name in convlstms:
             width += 180
-        elif layer_name in rnns:
+        elif layer_name in rnns or layer_name == 'Flatten':
             width += 140
         else:
             width += 80

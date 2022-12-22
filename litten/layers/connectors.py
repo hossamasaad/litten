@@ -12,7 +12,7 @@ class Connector:
         draw = ImageDraw.Draw(image)
         # [(x, y), (x, y)]
         for p1, p2 in zip(_from, _to):
-            draw.line([p1, p2], fill="#000000", width=1)
+            draw.line([p1, p2], fill="#000000", width=5)
 
         return image
     
@@ -20,16 +20,16 @@ class Connector:
         _from = layer1.get_from()
         draw = ImageDraw.Draw(image)
 
-        points1 = [(_from[0][0]     , _from[0][1] + 35),
-                   (_from[0][0] + 20, _from[0][1] + 35),
-                   (_from[0][0] + 15, _from[0][1] + 30),
-                   (_from[0][0] + 20, _from[0][1] + 35),
-                   (_from[0][0] + 15, _from[0][1] + 40)]
+        points1 = [(_from[0][0]      , _from[0][1] + 350),
+                   (_from[0][0] + 200, _from[0][1] + 350),
+                   (_from[0][0] + 150, _from[0][1] + 300),
+                   (_from[0][0] + 200, _from[0][1] + 350),
+                   (_from[0][0] + 150, _from[0][1] + 400)]
         
-        points2 = [(_from[1][0]     , _from[1][1] - 35),
-                   (_from[1][0] + 20, _from[1][1] - 35),
-                   (_from[1][0] + 15, _from[1][1] - 30),
-                   (_from[1][0] + 20, _from[1][1] - 35),
-                   (_from[1][0] + 15, _from[1][1] - 40)]
-        draw.line(points1, fill="#000000", width=2)
-        draw.line(points2, fill="#000000", width=2)
+        points2 = [(_from[1][0]     , _from[1][1] - 350),
+                   (_from[1][0] + 200, _from[1][1] - 350),
+                   (_from[1][0] + 150, _from[1][1] - 300),
+                   (_from[1][0] + 200, _from[1][1] - 350),
+                   (_from[1][0] + 150, _from[1][1] - 400)]
+        draw.line(points1, fill="#000000", width=5)
+        draw.line(points2, fill="#000000", width=5)
