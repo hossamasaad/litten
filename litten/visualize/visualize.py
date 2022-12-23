@@ -18,7 +18,7 @@ class ModelVisualizer:
         self.model            = model
 
 
-    def visualize_model(self, background_color = "#FFFFFF", palette = 'default', show_connectors=False, show_names=False, show_proporties=False):
+    def visualize_model(self, background_color = "#FFFFFF", palette = 'default', show_connectors=False, show_names=False, show_properties=False):
         
         # create connector
         connector = Connector()
@@ -44,7 +44,7 @@ class ModelVisualizer:
             shape = layers[0].input_shape
 
         last_layer = InputLayer(name="Input", shape=shape, start_x=20, palette=palette)
-        last_layer.draw(image=image, show_name=show_names, show_properties=show_proporties)
+        last_layer.draw(image=image, show_name=show_names, show_properties=show_properties)
         curr_layer = None
 
         for layer in layers:
@@ -97,7 +97,7 @@ class ModelVisualizer:
             else:
                 curr_layer = Layer(layer_name, start_x=last_layer.end, palette=palette)
 
-            curr_layer.draw(image=image, show_name=show_names, show_properties=show_proporties)
+            curr_layer.draw(image=image, show_name=show_names, show_properties=show_properties)
 
             if show_connectors:
                 connector.connect(image=image, layer1=last_layer, layer2=curr_layer)
@@ -116,7 +116,7 @@ class ModelVisualizer:
         
         fig = plt.figure()
         fig.suptitle("{}".format("Input Image") , fontsize=18)
-        plt.imshow(input_image)
+        plt.imshow(input_image.numpy().astype("uint8"))
 
         for layer in self.model.layers:  
 

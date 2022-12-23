@@ -16,7 +16,7 @@ palettes = {
 
 activations    = ["Activation", "Softmax", "ELU", "ReLU", "PReLU", "LeakyReLU", "ThresholdedReLU"]
 convs          = ["Conv1D", "Conv2D", "Conv3D", "SeparableConv1D", "SeparableConv2D", "SeparableConv3D", "DepthwiseConv2D", "Conv1DTranspose", "Conv2DTranspose", "Conv3DTranspose" ]
-pools          = ["MaxPooling1D", "MaxPooling2D", "MaxPooling3D", "AveragePooling1D", "AveragePooling2D", "AveragePooling3D", "GlobalMaxPooling1D", "GlobalMaxPooling2D", "GlobalMaxPooling3D", "GlobalAveragePooling1D", "GlobalAveragePooling2D", "GlobalAveragePooling3D"]
+pools          = ["MaxPooling1D", "MaxPooling2D", "MaxPooling3D", "AveragePooling1D", "AveragePooling2D", "AveragePooling3D"]
 rnns           = ["LSTM", "GRU", "RNN", "SimpleRNN", "Bidirectional"]
 convlstms      = ["ConvLSTM1D layer", "ConvLSTM2D layer", "ConvLSTM3D layer"]
 dropouts       = ["Dropout", "SpatialDropout1D", "SpatialDropout2D", "SpatialDropout3D", "GaussianDropout", "AlphaDropout"]
