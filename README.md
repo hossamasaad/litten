@@ -147,7 +147,7 @@ built                   :  True
     Example
     ```python
     vis = ModelVisualizer(model)
-    vis.visualize_featuremap(input_image, 'Blues')
+    vis.visualize_featuremap(input_image)
     ```
     <img src="images/feature_map1.png" width="500">
     <img src="images/feature_map2.png" width="1000">
